@@ -1,0 +1,43 @@
+<html>
+  <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
+    <script src="./script.js"></script>
+    <style>
+      .wrapper {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 7rem;
+        height: 5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(to top, rgba(150, 40, 40, 0.5), transparent);
+      }
+      .heart-svg {
+        width: 5rem;
+        position: absolute;
+        left: 1rem;
+        top: 0;
+        opacity: 0.5;
+
+      }
+      .text {
+        font-family: "Lato";
+        font-size: 3rem;
+        color: white;
+        z-index: 4;
+        text-shadow: 1px 1px 2px black;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <img class="heart-svg" src="./heart-svgrepo-com.svg" />
+      <div class="text" id="reading"></div> 
+    </div>
+  </body>
+</html>
+
