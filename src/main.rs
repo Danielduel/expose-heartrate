@@ -58,20 +58,35 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-async fn setup_polar() -> Result<arctic::PolarSensor, ()> {
-    println!("Searching for sensor");
-    let mut polar = arctic::PolarSensor::new("9333D32A".to_string())
-        .await
-        .unwrap();
+async fn construct_sensor() -> Result<arctic::PolarSensor, ()> {
+    let mut polar_o: Option<arctic::PolarSensor> = None;
+    while polar_o.is_none() {
+        match arctic::PolarSensor::new("9333D32A".to_string()).await {
+            Ok(sensor) => {
+                polar_o = Some(sensor);
+                println!("Sensor constructed");
+            }
+            Err(x) => {
+                println!("Retrying sensor construction");
+            }
+        }
+    }
+    return Ok(polar_o.unwrap());
+}
+
+async fn connect_sensor() -> Result<arctic::PolarSensor, ()> {
+    let mut polar = construct_sensor().await.unwrap();
+
     while !polar.is_connected().await {
+        println!("Trying to connect...");
         match polar.connect().await {
             Err(arctic::Error::NoBleAdaptor) => {
                 println!("No bluetooth adapter found");
-                return Err(());
             }
             Err(why) => {
                 println!("Could not connect: {:?}", why);
-                return Err(());
+                polar = construct_sensor().await.unwrap();
+                println!("Retrying");
             }
             _ => {}
         }
@@ -83,7 +98,14 @@ async fn setup_polar() -> Result<arctic::PolarSensor, ()> {
         println!("Could not subscribe to heart rate notifications: {:?}", why)
     }
     polar.event_handler(Handler);
+
     return Ok(polar);
+}
+
+async fn setup_polar() -> Result<arctic::PolarSensor, ()> {
+    println!("Searching for sensor");
+
+    return connect_sensor().await;
 }
 
 fn websocket_server_tick(ws: WsServer<NoTlsAcceptor, TcpListener>) {
